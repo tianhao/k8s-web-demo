@@ -1,0 +1,58 @@
+#deploy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zookeeper
+spec:
+  selector:
+    matchLabels:
+      app: zookeeper
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+    spec:
+      containers:
+      - name: zookeeper
+        image: 192.168.22.11/kubernetes/zookeeper:3.7.0
+        ports:
+        - name: client-port
+          containerPort: 2181
+        - name: follower-port
+          containerPort: 2888
+        - name: election-port
+          containerPort: 3888
+        - name: admin-port
+          containerPort: 8080
+---
+#service
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper
+spec:
+  ports:
+  - port: 2181
+    protocol: TCP
+    targetPort: 2181
+    nodePort: 2181
+    name: client-port
+  - port: 2888
+    protocol: TCP
+    targetPort: 2888
+    nodePort: 2888
+    name: follower-port
+  - port: 3888
+    protocol: TCP
+    targetPort: 3888
+    nodePort: 3888
+    name: election-port
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+    nodePort: 8080
+    name: admin-port
+  selector:
+    app: zookeeper
+  type: NodePort
